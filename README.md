@@ -1,4 +1,5 @@
-# GCTA_query
+# nuSeqQuery
+###Nucleotide Sequence Query
 
 ## 1. Project Overview
 This project leverages NCBI's **EFetch** web-based retrieval tool to fetch and process nucleotide sequence data.  
@@ -32,4 +33,11 @@ Milestones:
 
 ## 5. Tutorial
 
+  ### 5.1 python version and packages install
+    python 3.12
+    virtualenv setup
+    python3.12 -m venv venv
+    source venv/bin/activate
 
+    pip install -r requirements.txt
+  ### 5.2 launch app
