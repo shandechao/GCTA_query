@@ -1,5 +1,5 @@
 # nuSeqQuery
-###Nucleotide Sequence Query
+### Nucleotide Sequence Query
 
 ## 1. Project Overview
 This project leverages NCBI's **EFetch** web-based retrieval tool to fetch and process nucleotide sequence data.  
