@@ -26,10 +26,11 @@ Milestones:
   **Backend**  Django + celery + postgreSQL
   **Frontend** Django Templete + bootstrap + jQuery
 
-3.2 Architecture Diagram	
-  **Link** 
+3.2 Architecture and Design
+  [🗺️ Architecture and Design](./ARCHITECTURE_AND_DESIGN.md)
 
 ## 4. Live Demo
+  www.shandechao.com (might or might not be online — TBD 😅)
  
 ## 5. Tutorial
 
@@ -73,6 +74,8 @@ Milestones:
 
   ### 5.6 launch app
     step 1:
+      cd nuSeqQuery
+
       option 1. one button lanuch 
         supervisord -c supervisord.conf
 
@@ -90,5 +93,5 @@ Milestones:
       Open the browser
       localhost:8000 or yourhost:8000
 
-  ### User tutorial
-      link of user tutorial
+  ### User Toturial
+      [📘 User Guide](./USER_GUIDE.md)
