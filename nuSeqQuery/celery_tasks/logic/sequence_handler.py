@@ -40,6 +40,7 @@ def search_existing_sequences(query_list):
 
 
 def download_nucleotide_sequences_by_id(seq_id):
+    
     efetch_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
     params = {
         "db": "nucleotide",
@@ -71,7 +72,7 @@ def download_sequences(missing_ids):
 
     # Simulate downloading sequences
     for seq_id in missing_ids:
-        #start = time.perf_counter();
+        start = time.perf_counter();
         try:
             seq_id_str = seq_id.split("_");
         
@@ -120,8 +121,8 @@ def download_sequences(missing_ids):
             
             continue
 
-        #remaining = 0.4 - (time.perf_counter() - start)
-        #time.sleep(max(0, remaining))
+        remaining = 0.5 - (time.perf_counter() - start)
+        time.sleep(max(0, remaining))
 
     return {"status": "1", "message": "Sequences downloaded successfully."};
 
@@ -149,19 +150,21 @@ def do_patterns_search(regex_pattern, seq_id):
     matches = rp.finditer(tcga);
     matches = [ list(m.span()) for m in matches]
 
+    
     if not matches:
         #insert empty result
+        seq = models.CompletedSequence.objects.get(id=seq_id)
         models.SequencePatternSearch.objects.create(
             sequence=seq,
             pattern=regex_pattern,
-            result={
-                "motif_counts":0,
+            result={"result":{
+                
                 "starts":[],
                 "ends":[],
                 'overlap_counts':[],
-                "seq_length":len(tcga),
-            },
-            others = {}
+                
+            }},
+            others = {"info":{"motif_counts":0,"seq_length":len(tcga)}}
         )
         return "no matches";
     

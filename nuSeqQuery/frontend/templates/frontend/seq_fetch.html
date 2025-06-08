@@ -188,6 +188,8 @@
                 .addClass('disabled')      
                 .text('Processing...');
 
+                $("#patternSearchResult").html("")
+
                 $(this).attr("search_ids",queryId.join(','));
                 $(this).attr("dataSource",dataSource);
                 $(this).attr("rettype",rettype);
