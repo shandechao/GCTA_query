@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nuSeqQuery</title>
+    {% load static %}
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold text-primary" href="">Nucleotide Sequence Query</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+             <a class="nav-link active" target="_blank" href="{% url 'index' %}">Introduce</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" target="_blank" href="https://github.com/shandechao/nuSeqQuery">Docs</a>
+            </li>
+            
+          </ul>
+          <!--div class="d-flex">
+            <a class="btn btn-outline-primary me-2" href="#">Login</a>
+            <a class="btn btn-primary" href="#">Sign Up</a>
+          </div-->
+        </div>
+      </div>
+    </nav>
+    <div id="socketInfo"></div>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-4">
+                
+            
+                <div class="col-md-12">
+                    <h4>Step 1: Retrieve Data</h4>
+                </div>
+                <div class="mb-3 col-md-12">
+                    <label for="dataSourceSelect" class="form-label fw-semibold">Select Nucleotide Sequence Source</label>
+                    <select class="form-select form-select-sm" id="dataSourceSelect" style="max-width: 400px;">
+                        <option value="nucleotide" selected>nucleotide</option>
+                    </select>
+                </div>
+
+                <div class="mb-3 col-md-12">
+                    <label for="queryIdInput" class="form-label fw-semibold">Enter one or more IDs, separated by commas</label>
+                    <input type="text" class="form-control form-control-sm" style="max-width: 400px;" placeholder="Enter Id" id="queryIdInput" value="30271926,224589800">
+                    <small class="form-text text-muted">
+                        <strong>For example:</strong> 
+                        30271926,15718680
+                    </small>
+                </div>
+                <div class="mb-3 col-md-12">
+                    <label for="rettypeSelect" class="form-label fw-semibold">Select retrieval type</label>
+                    <select class="form-select form-select-sm" id="rettypeSelect" style="max-width: 200px;">
+                        <option value='fasta' selected>fasta</option>
+                    </select>
+
+                </div>
+                
+                <div class="mb-3 col-md-12">
+                    <button class="btn btn-primary btn-sm" id="prepareDataBtn">Retrieve</button>
+
+                    <br>
+                    <br>
+                </div>
+                
+                
+                
+            
+            </div>
+
+            <div class="col-md-8">
+
+                <div class="mt-2" id="loadinginfo">
+
+
+
+                </div>
+            </div>
+
+            <hr>
+
+        </div>
+        <div class="row" id="step2analysis" style="display: none;">
+             <div class="col-md-12">
+                <h4>Step 2: Analysis</h4>
+             </div>
+            <div class="mb-3 col-md-12">
+
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="pattern_search-tab" data-bs-toggle="tab"
+                                data-bs-target="#pattern_search" type="button" role="tab">Pattern Search</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="Others-tab" data-bs-toggle="tab"
+                                data-bs-target="#Others" type="button" role="tab">Others</button>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content mt-3" id="myTabContent">
+                    <div class="tab-pane fade show active" id="pattern_search" role="tabpanel">
+                        <div class="card p-3" id="patternsearchPanel"> 
+                            <div class="mb-3 col-md-12">
+                                <label for="regexPatternInput" class="form-label fw-semibold">Enter a regex pattern</label>
+                                <div class="input-group" style="max-width: 490px;">
+                                    <input type="text" class="form-control" placeholder="Enter Pattern" id="regexPatternInput" value="(AATCGA|GGCAT)">
+                                    <button class="btn btn-outline-secondary" type="button" id="regexSearchBtn">
+                                     🔍 
+                                    </button>
+
+                                </div>
+                                
+                                <small class="form-text text-muted">
+                                    <strong>For example:</strong> 
+                                    “(AATCGA|GGCAT)”
+                                </small>
+                            </div>
+
+                            <hr>
+
+                            <div class="mb-3 col-md-12" id="patternSearchResult">
+
+
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="Others" role="tabpanel">
+                        <div class="card p-3">
+                            <p>Coming Soon</p> 
+                            <p class="text-muted mt-2">
+                            This feature is currently in development and will be available in a future release.
+                            </p>
+
+
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+             
+
+        </div>
+    
+
+    </div>
+
+
+    <script>
+
+        const prefix = "{% url 'index' %}";
+        window.csrfToken = "{{ csrf_token }}";
+
+        $(function(){
+
+            var analysis_list=[];
+            // Handle the click event for the "Retrieve" button
+            $('#prepareDataBtn').on('click', function() {
+                var dataSource = $('#dataSourceSelect').val();
+                var queryId = $('#queryIdInput').val().trim().split(',');
+                queryId.map(s=>s.trim()).filter(s=>s.length>0);
+                var rettype = $('#rettypeSelect').val();
+
+                if (queryId.length === 0 || queryId[0] === '') {
+                    alert('Please enter at least one ID.');
+                    return;
+                }
+                analysis_list=[];
+                $("#step2analysis").hide();
+                $(this)
+                .prop('disabled', true)
+                .addClass('disabled')      
+                .text('Processing...');
+
+                $(this).attr("search_ids",queryId.join(','));
+                $(this).attr("dataSource",dataSource);
+                $(this).attr("rettype",rettype);
+               
+                $('#loadinginfo').html('<span>Retrieving data...</span><br>');
+                fetch(prefix+'api/sequence/fetch/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken':  window.csrfToken
+                    },
+                    body: JSON.stringify({
+                        dataSource: dataSource,
+                        queryId: queryId,
+                        rettype: rettype
+
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === '1') {
+                        $('#loadinginfo').append('<p id="loadingtitle">✅ Your request has been <span class="text-success">successfully</span> submitted. We will process it shortly.</p>');
+                        // Display the retrieved data in the right panel
+                        renderWaitingStatus($('#loadinginfo'),data.taskid);
+                        
+                    } else {
+                        $('#loadinginfo').append('<span class="text-danger">Error</span><span>: ' + data.message+"</span>");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    $('#loadinginfo').append('<p>An <span class="text-danger">error</span> occurred while retrieving data.</p>');
+                });
+
+
+            });
+
+
+            
+            function renderWaitingStatus(div ,taskid) {
+
+                var refresbtn = '<button type="button" class="btn btn-sm btn-outline-success" name="refreshstatus"> ↻ refresh</button>';
+                var ids = $('#prepareDataBtn').attr("search_ids");
+                ids = ids.split(',');
+                var statusp = '<p name="refreshstatuscontent" taskid="'+taskid+'">';
+                    for(var i=0; i<ids.length; i++) {
+                        statusp += '<span class="text-dark">ID: <span class="text-primary">'+ids[i]+'</span> - Status: </span>';
+                        statusp += '<span class="text-warning" search_id="'+ids[i]+'"> 🟡 Waiting</span><br>';
+                    }    
+                statusp+='</p>';
+                
+                div.append(refresbtn);
+                div.append(statusp);
+                div.find('[name="refreshstatus"]').click(function(){
+
+                    var taskid = div.find('p[name="refreshstatuscontent"]').attr('taskid');
+                    let ids = $('#prepareDataBtn').attr("search_ids");
+                    ids = ids.split(',');
+                    let dataSource = $('#prepareDataBtn').attr("dataSource");
+                    let rettype = $('#prepareDataBtn').attr("rettype");
+                    //START FETCH STATUS
+                    fetch(prefix+'api/sequence/task/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken':  window.csrfToken
+                        },
+                        body: JSON.stringify({
+                            dataSource: dataSource,
+                            queryId: ids,
+                            rettype: rettype,
+                            taskid: taskid
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        
+                        
+                        if (data.status === '1') {
+                            var fetchresults = data.data;
+
+                            analysis_list =[];
+                            div.html('<p>✅ Your request has been <span class="text-success">successfully</span> processed.</p>');
+                            for(var i in fetchresults) {
+                                if(fetchresults[i]["accession"] ==="N/A") {
+                                    //div.find('span[search_id="'+fetchresults[i].id.split("_")[2]+'"]').removeClass('text-warning').addClass('text-danger').text('❌ Not Found');
+                                    div.append('<h5 search_id="'+fetchresults[i].id.split("_")[2]+'">'+fetchresults[i].id.split("_")[2]+': ❌ Not Found</h5>');
+                                } else {
+                                    if(fetchresults[i]["length"] === 0) {
+                                        div.append('<h5 search_id="'+fetchresults[i].id.split("_")[2]+'">'+fetchresults[i].id.split("_")[2]+': ❌ Sequence Empty</h5>');
+                                    } else {
+                                        var infostr="<p class='text-dark'>";
+                                            for(var key in fetchresults[i]) {
+                                                if(key === "id") {
+                                                    continue;
+                                                }
+                                                infostr+="<strong>"+key+": </strong> "+fetchresults[i][key]+"";
+                                                if(key !== "length") {
+                                                    infostr+="<br>";
+                                                }
+                                            }
+                                            infostr+="</p>";
+                                        div.append('<h5 search_id="'+fetchresults[i].id.split("_")[2]+'">'+fetchresults[i].id.split("_")[2]+': ✅ Success</h5>').append(infostr);
+                                        analysis_list.push(fetchresults[i].id);
+                                    }   
+                                }
+                                
+                            }
+
+                            if(analysis_list.length > 0) {
+                                
+                                $('#step2analysis').show();
+                            }
+                            
+                            $('#prepareDataBtn')
+                            .prop('disabled', false)
+                            .removeClass('disabled')
+                            .text('Retrieve');
+                            
+                            div.find('[name="refreshstatus"]').remove();
+                            if(analysis_list.length ==1){
+                                div.append("<h5>1 ID be founded.</h5>");
+                            }else if(analysis_list.length > 1){
+                                div.append("<h5>"+analysis_list.length+" IDs be founded.</h5>");
+                            }else{
+                                div.append("<h5>No IDs be founded.</h5>");
+                            }
+                            
+
+                            
+                        }else if (data.status === '2'){
+
+                            $('#loadinginfo').append("<p>Still loading, please wait.</p>");
+
+                        } else {
+                             $('#loadinginfo').html('Error.</p>');
+                        }
+                    })
+                    .catch(error => {
+                        $('#loadinginfo').html('Error.</p>');
+                    });
+
+
+
+                    //END FETCH STATUS
+                    
+
+                })
+            }
+            //"Retrieve" button end
+
+            //analysis_list
+            // Handle the click event for the "Search" button in the regex search panel
+            $('#regexSearchBtn').on('click', function() {
+                var pattern = $('#regexPatternInput').val().trim();
+                if (pattern === '') {
+                    $("#patternSearchResult").html('Please enter a regex pattern.');
+                    return;
+                }else if (pattern.length < 3) {
+                    $("#patternSearchResult").html('Please enter a regex pattern with at least 3 characters.');
+                    
+                    return;
+                }else if (pattern.length > 200) {
+                    $("#patternSearchResult").html('Please enter a regex pattern with no more than 200 characters.');
+                    
+                    return;
+                }
+                if (analysis_list.length === 0) {
+                    $("#patternSearchResult").html('Please retrieve data first.');
+                    return;
+                }
+
+                $('#patternSearchResult').html('<span>Searching...</span>');
+                $(this)
+                .prop('disabled', true)
+                .addClass('disabled')
+                .text('Searching...');
+
+                fetch(prefix+'api/sequence/analysis/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken':  window.csrfToken
+                    },
+                    body: JSON.stringify({
+                        method: 'pattern_search',
+                        pattern: pattern,
+                        ids: analysis_list,
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === '1') {
+                        var taskid = data.taskid;
+                        renderPatternSearchResult($('#patternSearchResult'),pattern,analysis_list, taskid);
+                        
+                    } else {
+                        $('#patternSearchResult').html('<span class="text-danger">Error: ' + data.message + '</span>');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    $('#patternSearchResult').html('<span class="text-danger">An error occurred while searching.</span>');
+                });
+            });
+
+            function renderPatternSearchResult(div,pattern,analysis_list, taskid) {
+                div.html('');
+                div.append('<button type="button" class="btn btn-sm btn-outline-success" name="refreshpatternsearch"> ↻ refresh</button>');
+                div.append('<p>Searching .... </p>');
+
+                div.find('[name="refreshpatternsearch"]').click(function() {
+                    
+                    fetch(prefix+'api/sequence/analysis/results/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken':  window.csrfToken
+                        },
+                        body: JSON.stringify({
+                            method: 'pattern_search_status',
+                            pattern: pattern,
+                            ids: analysis_list,
+                            taskid: taskid,
+
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        
+                        if (data.status === "1") {
+                            $("#patternSearchResult").html('<span >Render Result</span>');
+
+                            render_pattern_result($("#patternSearchResult"), pattern, analysis_list,data["data"]);
+
+                        }else if(data.status=="2") {
+                             $("#patternSearchResult").append('<span >Please wait...</span>');
+
+                        }else {
+                            $("#patternSearchResult").html('<span class="text-danger">Error: ' + data.message + '</span>');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        div.find('p[name="refreshpatternsearchcontent"]').html('<span class="text-danger">An error occurred while searching.</span>');
+                    });
+                });
+                
+            }
+
+            function render_pattern_result(div,pattern,analysis_list,data){                
+                div.html("");
+                for(var i in data){
+                    div.append("<div name='"+i+"'><h5>"+i+" <a href='"+prefix+'api/sequence/analysis/results/pattern/'+data[i]["id"]+"/' class='btn btn-outline-primary btn-sm'  download>Pattern Locations Download</a></h5><div name='result_area'></div><div name='plot_area'></div></div>");
+                    var img_div = div.find("[name='"+i+"']").find("[name='plot_area']");
+                    var str_div = div.find("[name='"+i+"']").find("[name='result_area']");
+
+                    
+                    var renderstr="<p class='fs-5'>";
+                    if("seq_length" in data[i]["result"]){
+                        renderstr+='<strong>Seq-Len: </strong> '+data[i]["result"]["seq_length"]+" &nbsp;&nbsp;"
+                    }
+                    if("motif_counts" in data[i]["result"]){
+                        renderstr+='<strong>mtif-Counts: </strong> '+data[i]["result"]["motif_counts"]+" &nbsp;&nbsp;"
+                    }
+                    
+
+                    
+                    str_div.html(renderstr)
+
+
+                    for(plts in data[i]["plot"]){
+                        //console.log(data[i]["plot"])
+                        img_div.append("<img src='data:image/png;base64,"+data[i]["plot"][plts]+"' style='max-width:100%; height:auto;'>");
+
+                    }
+                    
+
+                }
+
+                $("#regexSearchBtn")
+                .prop('disabled', false)
+                .removeClass('disabled')
+                .text('🔍');
+                
+                
+            }
+
+        });              
+        
+    </script>
+
+</body>
+</html>
