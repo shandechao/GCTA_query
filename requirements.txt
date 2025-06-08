@@ -32,6 +32,7 @@ requests==2.32.3
 six==1.17.0
 sortedcontainers==2.4.0
 sqlparse==0.5.3
+supervisor==4.2.5
 tzdata==2025.2
 urllib3==2.4.0
 uvicorn==0.34.3
