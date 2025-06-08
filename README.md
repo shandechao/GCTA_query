@@ -29,7 +29,7 @@ Milestones:
 **Backend:** Django + Redis + Celery + PostgreSQL  
 **Frontend:** Django Template + Bootstrap + jQuery
 
-3.2 Architecture and Design
+**3.2 Architecture and Design**
 [🗺️ Architecture and Design](./ARCHITECTURE_AND_DESIGN.md)
 
 ## 4. Live Demo
