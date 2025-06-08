@@ -1,4 +1,4 @@
-1. open browser http://localhost:8000/seqfetch/ -> input id , click Retrieve button.  
+1. open browser localhost:8000/seqfetch/ -> input id , click Retrieve button.  
 2. click refresh button to check the retrieving status
 3. after retrieving data ready. it will show the information and Step 2
 4. input pattern click search button
