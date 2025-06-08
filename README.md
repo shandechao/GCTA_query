@@ -59,7 +59,7 @@ www.shandechao.com (might or might not be online — TBD 😅)
   CREATE USER admin WITH PASSWORD 'iamadmin';
   GRANT ALL PRIVILEGES ON DATABASE nsq_cache TO admin;
 
-  ## 5.4 Redis setup
+  ### 5.4 Redis setup
   **Redis Install **
   sudo apt update
   sudo apt install redis-server
@@ -95,7 +95,7 @@ www.shandechao.com (might or might not be online — TBD 😅)
     Open the browser
     localhost:8000 or yourhost:8000
 
-  ### User Toturial
+  ## User Toturial
   [📘 User Guide](./USER_GUIDE.md)
      
     
