@@ -17,9 +17,9 @@ Milestones:
 - [x] Explore and Test NCBI EFetch API
       1. use demo eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&id=30271926&rettype=fasta&retmode=xml
       2. Request Limitations , 3 request/second;
-- [x] System Desing
+- [x] System Design
 - [x] Project Development
-- [ ] Deployment
+- [x] Deployment and Test
 
 ## 3. System Design
 3.1 tech stack
@@ -27,21 +27,26 @@ Milestones:
   **Frontend** Django Templete + bootstrap + jQuery
 
 3.2 Architecture Diagram	
-
+  **Link** 
 
 ## 4. Live Demo
-
+ 
 ## 5. Tutorial
 
   ### 5.1 python version and packages install
-    python 3.12
+    python 3.11+ ( Other Python 3 versions are expected to work, but they have not been tested )
     virtualenv setup
-    python3.12 -m venv venv
+    python3.11 -m venv venv
     source venv/bin/activate
 
     pip install -r requirements.txt
 
-  ### 5.2 postgresql setup
+  ### 5.2 Run the single-script version (this version does not require setting up a database or Celery).
+    python seq_pattern_search_no_cache.py 30271926 "(AATCGA|GGCAT)"
+    or 
+    python seq_pattern_search_no_cache.py 30271926 "(AATCGA|GGCAT)" > pattern_location.txt
+
+  ### 5.3 postgresql setup
     
     Make sure PostgreSQL is installed and running on the default port 5432.
 
@@ -49,7 +54,7 @@ Milestones:
     CREATE USER admin WITH PASSWORD 'iamadmin';
     GRANT ALL PRIVILEGES ON DATABASE nsq_cache TO admin;
 
-  ## 5.3 Redis setup
+  ## 5.4 Redis setup
     **Redis Install **
     sudo apt update
     sudo apt install redis-server
@@ -61,50 +66,29 @@ Milestones:
     should return PONG
 
 
+  ### 5.5 use django management test function
+    python manage.py run_seq_pattern_search 30271926 "(AATCGA|GGCAT)"
+    or
+    python manage.py run_seq_pattern_search 30271926 "(AATCGA|GGCAT)" > match_arr.txt
 
-  ### 5.2 launch app
-    # 1 single celery worker for sequence download. (To avoid IP blocking by NCBI )
-    celery -A your_project worker -Q sequence --concurrency=1 --pool=solo --loglevel=info
+  ### 5.6 launch app
+    step 1:
+      option 1. one button lanuch 
+        supervisord -c supervisord.conf
 
-    watchmedo auto-restart \
-     --directory=./ \
-     --pattern="*.py" \
-     --recursive \
-     -- celery -A nuSeqQuery worker \
-     --loglevel=WARNING \
-     --concurrency=1 \
-     --max-tasks-per-child=100 \
-     --hostname=sequence_worker@%h \
-     --queues=sequence \
-     --pool=solo
+      option 2. step by step lanuch
+        celery for fetch: 
+        celery -A nuSeqQuery worker --loglevel=WARNING --concurrency=1 --max-tasks-per-child=1 --hostname=sequence_worker@%h --queues=sequence --pool=solo &
 
+        celery for analysis/pattern match: 
+        celery -A nuSeqQuery worker --loglevel=WARNING --concurrency=1 --max-tasks-per-child=1 --hostname=analysis_worker@%h --queues=analysis --pool=solo &
 
-    # you can use multiple celery workers for analysis like pattern match
-    watchmedo auto-restart \
-     --directory=./ \
-     --pattern="*.py" \
-     --recursive \
-     -- celery -A nuSeqQuery worker \
-     --loglevel=info \
-     --concurrency=1 \
-     --max-tasks-per-child=100 \
-     --hostname=analysis_worker2@%h \
-     --queues=analysis \
-     --pool=solo
+        lanuch django app
+        uvicorn nuSeqQuery.asgi:application --host 0.0.0.0 --port 8000
 
+    step 2:
+      Open the browser
+      localhost:8000 or yourhost:8000
 
-
-     watchmedo auto-restart \
-     --directory=./ \
-     --pattern="*.py" \
-     --recursive \
-     -- celery -A nuSeqQuery worker \
-     --loglevel=info \
-     --concurrency=2 \
-     --max-tasks-per-child=2 \
-     --hostname=analysis_worker2@%h \
-     --queues=analysis \
-    
-
-
-     pkill -f 'celery'
+  ### User tutorial
+      link of user tutorial
