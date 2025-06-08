@@ -77,7 +77,7 @@ www.shandechao.com (might or might not be online — TBD 😅)
   ### 5.6 launch app
   **step 1:**  
     cd nuSeqQuery
-    ***option 1. one button lanuch***
+    ***option 1. one button lanuch (first time launch recommand use option 2)*** 
     supervisord -c supervisord.conf
 
     ***option 2. step by step lanuch***
@@ -88,6 +88,8 @@ www.shandechao.com (might or might not be online — TBD 😅)
     celery -A nuSeqQuery worker --loglevel=WARNING --concurrency=1 --max-tasks-per-child=1 --hostname=analysis_worker@%h --queues=analysis --pool=solo &
 
     lanuch django app
+    python manage.py makemigrations
+    python manage.py migrate
     uvicorn nuSeqQuery.asgi:application --host 0.0.0.0 --port 8000
 
   **step 2:**
