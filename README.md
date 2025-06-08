@@ -22,7 +22,7 @@ Milestones:
 - [x] Deployment and Test
 
 ## 3. System Design
-*3.1 tech stack*
+***3.1 tech stack***
 **Simple Script Version**  
 Python 3 only  
 
