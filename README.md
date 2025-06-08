@@ -38,7 +38,7 @@ www.shandechao.com (might or might not be online — TBD 😅)
 ## 5. Tutorial
 
   ### 5.1 python version and packages install
-  python 3.11+ ( Other Python 3 versions are expected to work, but they have not been tested )。
+  python 3.11+ ( Other Python 3 versions are expected to work, but they have not been tested )。  
   virtualenv setup  
   python3.11 -m venv venv  
   source venv/bin/activate  
