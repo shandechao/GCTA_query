@@ -62,6 +62,11 @@ www.shandechao.com (might or might not be online — TBD 😅)
   **Redis Install **  
   sudo apt update  
   sudo apt install redis-server  
+
+  **ubuntu**
+  sudo systemctl enable redis-server  
+  sudo systemctl start redis-server
+  **macOS**
   sudo systemctl enable redis  
   sudo systemctl start redis  
     
