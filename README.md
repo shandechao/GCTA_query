@@ -82,11 +82,10 @@ www.shandechao.com (might or might not be online — TBD 😅)
   ### 5.6 launch app  
   **step 1:**    
     cd nuSeqQuery  
-    ***option 1. one button lanuch (first time launch recommand use option 2)***     
+  ***option 1. one button lanuch (first time launch recommand use option 2)***     
     supervisord -c supervisord.conf   
-    
 
-    **option 2. step by step lanuch**    
+  **option 2. step by step lanuch**    
     celery for fetch:   
     celery -A nuSeqQuery worker --loglevel=WARNING --concurrency=1 --max-tasks-per-child=1 --hostname=sequence_worker@%h --queues=sequence --pool=solo &  
   
