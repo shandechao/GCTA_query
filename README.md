@@ -86,16 +86,17 @@ www.shandechao.com (might or might not be online — TBD 😅)
     supervisord -c supervisord.conf   
 
   **option 2. step by step lanuch**    
-    celery for fetch:   
-    celery -A nuSeqQuery worker --loglevel=WARNING --concurrency=1 --max-tasks-per-child=1 --hostname=sequence_worker@%h --queues=sequence --pool=solo &  
+    
+  celery for fetch:   
+  celery -A nuSeqQuery worker --loglevel=WARNING --concurrency=1 --max-tasks-per-child=1 --hostname=sequence_worker@%h --queues=sequence --pool=solo &  
   
-    celery for analysis/pattern match:   
-    celery -A nuSeqQuery worker --loglevel=WARNING --concurrency=1 --max-tasks-per-child=1 --hostname=analysis_worker@%h --queues=analysis --pool=solo &  
+  celery for analysis/pattern match:   
+  celery -A nuSeqQuery worker --loglevel=WARNING --concurrency=1 --max-tasks-per-child=1 --hostname=analysis_worker@%h --queues=analysis --pool=solo &  
 
-    lanuch django app  
-    python manage.py makemigrations  
-    python manage.py migrate  
-    uvicorn nuSeqQuery.asgi:application --host 0.0.0.0 --port 8000  
+  **lanuch django app**  
+  python manage.py makemigrations   
+  python manage.py migrate  
+  uvicorn nuSeqQuery.asgi:application --host 0.0.0.0 --port 8000  
 
   **step 2:**  
     Open the browser  
