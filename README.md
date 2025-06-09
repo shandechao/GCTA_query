@@ -64,11 +64,11 @@ www.shandechao.com (might or might not be online — TBD 😅)
   sudo apt install redis-server  
 
   **ubuntu**
-  sudo systemctl enable redis-server  
-  sudo systemctl start redis-server
-  **macOS**
-  sudo systemctl enable redis  
-  sudo systemctl start redis  
+  sudo systemctl enable redis-server    
+  sudo systemctl start redis-server    
+  **macOS**  
+  sudo systemctl enable redis    
+  sudo systemctl start redis    
     
   **check**  
   redis-cli ping  
