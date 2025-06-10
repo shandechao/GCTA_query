@@ -33,7 +33,7 @@ Milestones:
 [🗺️ Architecture and Design](./ARCHITECTURE_AND_DESIGN.md)
 
 ## 4. Live Demo
-www.shandechao.com (might or might not be online — TBD 😅)
+https://www.shandechao.com/simonsOA/seqfetch/
  
 ## 5. Tutorial
 
