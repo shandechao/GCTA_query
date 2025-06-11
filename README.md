@@ -83,6 +83,9 @@ https://www.shandechao.com/simonsOA/seqfetch/
   **step 1:**    
     cd nuSeqQuery  
   ***option 1. one button lanuch (first time launch recommand use option 2)***     
+    python manage.py makemigrations
+    python manage.py migrate
+    
     supervisord -c supervisord.conf   
 
   **option 2. step by step lanuch**    
